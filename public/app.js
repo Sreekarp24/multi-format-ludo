@@ -744,7 +744,6 @@ function getStaticPiecePosition(playerId, playerIndex, steps, pieceIndex, room) 
 
 // 60FPS Game tick update loops
 function animateVisualTick(room) {
-  let needsRedraw = false;
   const speed = boardScale * 0.018; // Velocity
 
   room.players.forEach((player) => {
@@ -766,14 +765,12 @@ function animateVisualTick(room) {
           visual.x += (dx / dist) * speed;
           visual.y += (dy / dist) * speed;
         }
-        needsRedraw = true;
       }
     });
   });
 
-  if (needsRedraw) {
-    drawLudoBoard(room, true);
-  }
+  // Always redraw on every animation frame for 60FPS fluid updates!
+  drawLudoBoard(room, true);
 }
 
 function startGameLoop(room) {
