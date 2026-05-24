@@ -1,6 +1,53 @@
 // Frontend Ludo Realm Application Controller
 const socket = io();
 
+// Connection Status Management
+const connectionStatus = document.getElementById('connectionStatus');
+
+function setConnectionState(state) {
+  if (!connectionStatus) return;
+  if (state === 'connected') {
+    connectionStatus.className = "flex items-center space-x-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20";
+    connectionStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span><span>Connected to Server</span>`;
+    btnCreateRoom.style.opacity = "1";
+    btnCreateRoom.style.pointerEvents = "auto";
+    btnJoinRoom.style.opacity = "1";
+    btnJoinRoom.style.pointerEvents = "auto";
+  } else if (state === 'connecting') {
+    connectionStatus.className = "flex items-center space-x-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20";
+    connectionStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span><span>Waking up Server (~50s)...</span>`;
+    btnCreateRoom.style.opacity = "0.5";
+    btnCreateRoom.style.pointerEvents = "none";
+    btnJoinRoom.style.opacity = "0.5";
+    btnJoinRoom.style.pointerEvents = "none";
+  } else {
+    connectionStatus.className = "flex items-center space-x-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20";
+    connectionStatus.innerHTML = `<span class="w-2 h-2 rounded-full bg-rose-400"></span><span>Disconnected</span>`;
+    btnCreateRoom.style.opacity = "0.5";
+    btnCreateRoom.style.pointerEvents = "none";
+    btnJoinRoom.style.opacity = "0.5";
+    btnJoinRoom.style.pointerEvents = "none";
+  }
+}
+
+// Initial state is connecting
+setTimeout(() => setConnectionState(socket.connected ? 'connected' : 'connecting'), 100);
+
+socket.on('connect', () => {
+  console.log("Socket connected successfully!");
+  setConnectionState('connected');
+});
+
+socket.on('disconnect', () => {
+  console.log("Socket disconnected.");
+  setConnectionState('disconnected');
+});
+
+socket.on('connect_error', () => {
+  console.log("Socket connection error (Server is likely sleeping).");
+  setConnectionState('connecting');
+});
+
 // UI Screen Elements
 const screenLanding = document.getElementById('screenLanding');
 const screenLobby = document.getElementById('screenLobby');
