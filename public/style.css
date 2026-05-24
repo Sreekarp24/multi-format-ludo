@@ -1,0 +1,128 @@
+/* Custom Premium Stylesheet for Ludo Realm */
+
+:root {
+  --neon-glow-red: 0 0 15px rgba(255, 74, 90, 0.4);
+  --neon-glow-green: 0 0 15px rgba(46, 196, 182, 0.4);
+  --neon-glow-yellow: 0 0 15px rgba(255, 191, 0, 0.4);
+  --neon-glow-blue: 0 0 15px rgba(0, 119, 182, 0.4);
+  --neon-glow-purple: 0 0 15px rgba(157, 78, 221, 0.4);
+  --neon-glow-orange: 0 0 15px rgba(247, 127, 0, 0.4);
+  
+  --neon-border-red: rgba(255, 74, 90, 0.3);
+  --neon-border-green: rgba(46, 196, 182, 0.3);
+  --neon-border-yellow: rgba(255, 191, 0, 0.3);
+  --neon-border-blue: rgba(0, 119, 182, 0.3);
+  --neon-border-purple: rgba(157, 78, 221, 0.3);
+  --neon-border-orange: rgba(247, 127, 0, 0.3);
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.3);
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+/* App-wide enhancements */
+body {
+  font-family: 'Outfit', sans-serif;
+  background-color: #0b0f19;
+}
+
+/* Active formats indicator */
+.active-format {
+  border-color: #6366f1 !important;
+  background: rgba(99, 102, 241, 0.1) !important;
+  box-shadow: 0 0 20px rgba(99, 102, 241, 0.15);
+}
+
+/* Glassmorphism utility card */
+.glass-panel {
+  background: rgba(15, 23, 42, 0.45);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Canvas Board Container Layout */
+#boardContainer {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+#ludoBoard {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: 100%;
+  aspect-ratio: 1 / 1;
+}
+
+/* Glowing animations for current turn indicator */
+.glow-border-red { border-color: #ff4a5a !important; box-shadow: var(--neon-glow-red); }
+.glow-border-green { border-color: #2ec4b6 !important; box-shadow: var(--neon-glow-green); }
+.glow-border-yellow { border-color: #ffbf00 !important; box-shadow: var(--neon-glow-yellow); }
+.glow-border-blue { border-color: #0077b6 !important; box-shadow: var(--neon-glow-blue); }
+.glow-border-purple { border-color: #9d4edd !important; box-shadow: var(--neon-glow-purple); }
+.glow-border-orange { border-color: #f77f00 !important; box-shadow: var(--neon-glow-orange); }
+
+.glow-bg-red { background-color: rgba(255, 74, 90, 0.1) !important; }
+.glow-bg-green { background-color: rgba(46, 196, 182, 0.1) !important; }
+.glow-bg-yellow { background-color: rgba(255, 191, 0, 0.1) !important; }
+.glow-bg-blue { background-color: rgba(0, 119, 182, 0.1) !important; }
+.glow-bg-purple { background-color: rgba(157, 78, 221, 0.1) !important; }
+.glow-bg-orange { background-color: rgba(247, 127, 0, 0.1) !important; }
+
+/* 3D Dice Spin Animation */
+@keyframes dice-roll-spin {
+  0% { transform: scale(0.9) rotate(0deg); filter: blur(0.5px); }
+  25% { transform: scale(1.1) rotate(180deg) translateY(-10px); }
+  50% { transform: scale(1.0) rotate(360deg) translateX(10px) rotateY(180deg); }
+  75% { transform: scale(1.1) rotate(540deg) translateY(10px) rotateX(180deg); }
+  100% { transform: scale(1) rotate(720deg); filter: none; }
+}
+
+.dice-rolling {
+  animation: dice-roll-spin 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) infinite;
+}
+
+/* Keyframes for smooth fadeIn transition scales */
+@keyframes scale-up {
+  0% { opacity: 0; transform: scale(0.92); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+.animate-scaleUp {
+  animation: scale-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Glow Pulse for Valid selectable pieces */
+@keyframes piece-pulse {
+  0% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.4); }
+  50% { box-shadow: 0 0 25px rgba(255, 255, 255, 0.95); }
+  100% { box-shadow: 0 0 5px rgba(255, 255, 255, 0.4); }
+}
+
+.valid-piece-glow {
+  animation: piece-pulse 1.2s infinite ease-in-out;
+}
+
+/* Live battle log customization */
+#gameFeedLogs div {
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+#gameFeedLogs div:last-child {
+  border-bottom: none;
+}

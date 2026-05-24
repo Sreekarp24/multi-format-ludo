@@ -1,0 +1,17 @@
+{
+  "name": "multi-format-ludo",
+  "version": "1.0.0",
+  "description": "Lightweight Real-time Multiplayer Ludo (4, 5, & 6 players) using Node.js, Express, and Socket.io",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2",
+    "socket.io": "^4.7.5"
+  },
+  "author": "Antigravity",
+  "license": "ISC"
+}

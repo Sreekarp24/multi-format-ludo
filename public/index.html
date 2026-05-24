@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ludo Realm | 4, 5, & 6 Player Multiplayer</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Google Fonts: Outfit & Space Grotesk -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Custom Premium Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+  
+  <!-- Tailwind Configuration for Theme Customization -->
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Outfit', 'sans-serif'],
+            display: ['Space Grotesk', 'sans-serif'],
+          },
+          colors: {
+            ludoRed: '#ff4a5a',
+            ludoGreen: '#2ec4b6',
+            ludoYellow: '#ffbf00',
+            ludoBlue: '#0077b6',
+            ludoPurple: '#9d4edd',
+            ludoOrange: '#f77f00',
+            glassDark: 'rgba(15, 23, 42, 0.45)',
+            glassBorder: 'rgba(255, 255, 255, 0.08)'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#0f172a] text-slate-100 min-h-screen overflow-x-hidden relative flex flex-col font-sans">
+  
+  <!-- Decorative Background Gradients -->
+  <div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-indigo-500/10 blur-[120px] pointer-events-none z-0"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] rounded-full bg-violet-600/10 blur-[120px] pointer-events-none z-0"></div>
+
+  <!-- Header / Navbar -->
+  <header class="w-full py-5 px-6 border-b border-glassBorder backdrop-blur-md sticky top-0 z-40 bg-[#0f172a]/70">
+    <div class="max-w-7xl mx-auto flex items-center justify-between">
+      <div class="flex items-center space-x-3 cursor-pointer">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-500 via-violet-600 to-pink-500 flex items-center justify-center shadow-lg shadow-indigo-500/20">
+          <i class="fa-solid fa-dice-d20 text-white text-xl animate-pulse"></i>
+        </div>
+        <span class="text-2xl font-bold font-display tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">Ludo Realm</span>
+      </div>
+      <div id="connectionStatus" class="flex items-center space-x-2 text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+        <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+        <span>Connected to Server</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Notification Banner -->
+  <div id="alertBanner" class="hidden fixed top-24 left-1/2 transform -translate-x-1/2 z-50 px-6 py-3 rounded-xl bg-rose-500/90 text-white shadow-xl shadow-rose-950/20 backdrop-blur-md border border-rose-400/20 flex items-center space-x-3 animate-bounce">
+    <i class="fa-solid fa-circle-exclamation text-lg"></i>
+    <span id="alertMessage" class="font-medium">Error occurred!</span>
+  </div>
+
+  <main class="flex-grow flex items-center justify-center p-4 md:p-6 z-10">
+    
+    <!-- 1. LANDING SCREEN -->
+    <div id="screenLanding" class="w-full max-w-xl bg-glassDark border border-glassBorder backdrop-blur-xl rounded-3xl p-8 shadow-2xl transition-all duration-500 relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-indigo-500/10 rounded-full blur-2xl"></div>
+      
+      <div class="text-center mb-8">
+        <h1 class="text-4xl font-extrabold font-display bg-gradient-to-r from-indigo-200 via-white to-violet-300 bg-clip-text text-transparent mb-2">Welcome to Ludo Realm</h1>
+        <p class="text-slate-400 text-sm">Real-time lightweight Ludo for 4, 5, or 6 players. Create a private session and play with your friends!</p>
+      </div>
+
+      <!-- Action Toggles -->
+      <div class="grid grid-cols-2 gap-4 mb-6 bg-slate-950/40 p-1.5 rounded-2xl border border-glassBorder">
+        <button id="toggleCreateTab" class="py-3 rounded-xl font-semibold text-sm transition-all duration-300 bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-lg shadow-indigo-500/25" onclick="switchLandingTab('create')">
+          <i class="fa-solid fa-plus-circle mr-2"></i>Create Game
+        </button>
+        <button id="toggleJoinTab" class="py-3 rounded-xl font-semibold text-sm transition-all duration-300 text-slate-400 hover:text-slate-200" onclick="switchLandingTab('join')">
+          <i class="fa-solid fa-right-to-bracket mr-2"></i>Join Game
+        </button>
+      </div>
+
+      <!-- Create Form -->
+      <div id="formCreate" class="space-y-6">
+        <div>
+          <label for="createName" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Your Nickname</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+              <i class="fa-solid fa-user"></i>
+            </span>
+            <input type="text" id="createName" placeholder="e.g., PixelKnight" class="w-full bg-slate-950/30 border border-glassBorder rounded-xl py-3.5 pl-11 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-medium">
+          </div>
+        </div>
+
+        <div>
+          <label class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Select Format</label>
+          <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2.5">
+            <button type="button" class="format-btn py-3 rounded-xl border border-glassBorder bg-slate-950/20 text-slate-300 font-semibold hover:bg-indigo-500/5 hover:border-indigo-500/40 transition-all flex flex-col items-center justify-center space-y-1" data-count="2">
+              <span class="text-sm font-bold">2 Players</span>
+              <span class="text-[9px] text-rose-400 font-normal">Duo Duel</span>
+            </button>
+            <button type="button" class="format-btn py-3 rounded-xl border border-glassBorder bg-slate-950/20 text-slate-300 font-semibold hover:bg-indigo-500/5 hover:border-indigo-500/40 transition-all flex flex-col items-center justify-center space-y-1" data-count="3">
+              <span class="text-sm font-bold">3 Players</span>
+              <span class="text-[9px] text-emerald-400 font-normal">Tri-Star</span>
+            </button>
+            <button type="button" class="format-btn py-3 rounded-xl border border-glassBorder bg-slate-950/20 text-slate-300 font-semibold hover:bg-indigo-500/5 hover:border-indigo-500/40 active-format transition-all flex flex-col items-center justify-center space-y-1" data-count="4">
+              <span class="text-sm font-bold">4 Players</span>
+              <span class="text-[9px] text-indigo-400 font-normal">Traditional</span>
+            </button>
+            <button type="button" class="format-btn py-3 rounded-xl border border-glassBorder bg-slate-950/20 text-slate-300 font-semibold hover:bg-indigo-500/5 hover:border-indigo-500/40 transition-all flex flex-col items-center justify-center space-y-1" data-count="5">
+              <span class="text-sm font-bold">5 Players</span>
+              <span class="text-[9px] text-purple-400 font-normal">Pentagon</span>
+            </button>
+            <button type="button" class="format-btn py-3 rounded-xl border border-glassBorder bg-slate-950/20 text-slate-300 font-semibold hover:bg-indigo-500/5 hover:border-indigo-500/40 transition-all flex flex-col items-center justify-center space-y-1" data-count="6">
+              <span class="text-sm font-bold">6 Players</span>
+              <span class="text-[9px] text-orange-400 font-normal">Hexagonal</span>
+            </button>
+          </div>
+        </div>
+
+        <button id="btnCreateRoom" class="w-full bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500 text-white font-bold py-4 rounded-xl shadow-xl shadow-indigo-950/30 hover:opacity-95 transition-all duration-300 transform active:scale-[0.98] mt-2 flex items-center justify-center space-x-2">
+          <span>Create Lobby</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- Join Form -->
+      <div id="formJoin" class="space-y-6 hidden">
+        <div>
+          <label for="joinName" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Your Nickname</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+              <i class="fa-solid fa-user"></i>
+            </span>
+            <input type="text" id="joinName" placeholder="e.g., NeonRider" class="w-full bg-slate-950/30 border border-glassBorder rounded-xl py-3.5 pl-11 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-medium">
+          </div>
+        </div>
+
+        <div>
+          <label for="joinCode" class="block text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Room Code</label>
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-4 flex items-center text-slate-400">
+              <i class="fa-solid fa-key"></i>
+            </span>
+            <input type="text" id="joinCode" placeholder="e.g., XF92K" class="w-full bg-slate-950/30 border border-glassBorder rounded-xl py-3.5 pl-11 pr-4 text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition-all font-medium tracking-widest uppercase">
+          </div>
+        </div>
+
+        <button id="btnJoinRoom" class="w-full bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-bold py-4 rounded-xl shadow-xl shadow-indigo-950/30 hover:opacity-95 transition-all duration-300 transform active:scale-[0.98] mt-2 flex items-center justify-center space-x-2">
+          <span>Enter Room</span>
+          <i class="fa-solid fa-arrow-right-to-bracket"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- 2. LOBBY SCREEN -->
+    <div id="screenLobby" class="w-full max-w-2xl bg-glassDark border border-glassBorder backdrop-blur-xl rounded-3xl p-8 shadow-2xl transition-all duration-500 hidden relative overflow-hidden">
+      <div class="absolute top-0 right-0 w-36 h-36 bg-pink-500/10 rounded-full blur-2xl"></div>
+
+      <div class="flex flex-col md:flex-row justify-between items-start md:items-center border-b border-glassBorder pb-6 mb-6 gap-4">
+        <div>
+          <h2 class="text-3xl font-extrabold font-display bg-gradient-to-r from-indigo-200 to-pink-300 bg-clip-text text-transparent">Lobby Room</h2>
+          <p class="text-slate-400 text-xs mt-1">Share the code below with your friends to join.</p>
+        </div>
+        
+        <!-- Room Code Card -->
+        <div class="bg-slate-950/60 border border-glassBorder rounded-2xl py-3 px-5 flex items-center space-x-4 shadow-inner">
+          <div class="flex flex-col">
+            <span class="text-[9px] font-bold text-slate-500 uppercase tracking-widest">Room Code</span>
+            <span id="lobbyRoomCode" class="text-2xl font-black font-display text-indigo-400 tracking-wider">-----</span>
+          </div>
+          <button id="btnCopyCode" class="w-10 h-10 bg-slate-900 border border-glassBorder hover:bg-slate-800 rounded-xl flex items-center justify-center text-slate-300 hover:text-white transition-all active:scale-95" title="Copy Room Code">
+            <i class="fa-solid fa-copy"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Player Slots Grid -->
+      <div class="space-y-4 mb-8">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold text-slate-400 uppercase tracking-wider">Players Joined (<span id="joinedCount">0</span>/<span id="targetCount">4</span>)</span>
+          <span id="lobbyStatusDot" class="flex items-center text-xs text-amber-400 font-semibold bg-amber-500/10 border border-amber-500/25 px-2.5 py-1 rounded-full space-x-1.5 animate-pulse">
+            <span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>
+            <span>Waiting for players...</span>
+          </span>
+        </div>
+        
+        <div id="playerSlotsList" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+          <!-- Populated dynamically via JS -->
+        </div>
+      </div>
+
+      <!-- Host Action Buttons -->
+      <div id="lobbyHostPanel" class="flex justify-end space-x-3 pt-4 border-t border-glassBorder">
+        <button id="btnLeaveLobby" class="py-3.5 px-6 rounded-xl border border-glassBorder hover:bg-slate-950/20 text-slate-400 hover:text-white transition-all font-semibold text-sm">
+          Leave Lobby
+        </button>
+        <button id="btnStartGame" class="py-3.5 px-8 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-lg shadow-emerald-950/30 hover:opacity-95 font-extrabold text-sm transition-all transform active:scale-95 disabled:opacity-50 disabled:pointer-events-none" disabled>
+          Start Ludo Realm
+        </button>
+      </div>
+    </div>
+
+    <!-- 3. GAME SCREEN -->
+    <div id="screenGame" class="w-full max-w-7xl flex flex-col lg:flex-row gap-6 hidden transition-all duration-500 items-stretch justify-center">
+      
+      <!-- Main Game Board Panel (Canvas) -->
+      <div class="flex-grow bg-glassDark border border-glassBorder backdrop-blur-xl rounded-3xl p-4 md:p-6 shadow-2xl flex flex-col items-center justify-center relative min-h-[500px] lg:min-h-[720px]">
+        <div id="boardContainer" class="w-full max-w-[650px] aspect-square relative flex items-center justify-center rounded-2xl bg-slate-950/40 border border-glassBorder/50 shadow-inner">
+          <canvas id="ludoBoard" class="rounded-xl"></canvas>
+        </div>
+      </div>
+
+      <!-- Side Control Panel -->
+      <div class="w-full lg:w-[380px] shrink-0 bg-glassDark border border-glassBorder backdrop-blur-xl rounded-3xl p-6 shadow-2xl flex flex-col justify-between space-y-6">
+        
+        <!-- Scoreboard / Turn Indicator -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between border-b border-glassBorder pb-4">
+            <h3 class="text-xl font-bold font-display bg-gradient-to-r from-indigo-200 to-pink-300 bg-clip-text text-transparent">Game Center</h3>
+            <span class="text-[10px] font-bold text-slate-400 bg-slate-950/50 border border-glassBorder py-1 px-2.5 rounded-full flex items-center space-x-1.5">
+              <span class="w-1 h-1 rounded-full bg-indigo-400"></span>
+              <span id="gameRoomCodeDisp">Code: -----</span>
+            </span>
+          </div>
+
+          <!-- Scoreboard List -->
+          <div id="scoreboardList" class="space-y-2.5">
+            <!-- Populated dynamically via JS -->
+          </div>
+        </div>
+
+        <!-- Animated Dice Roll Widget -->
+        <div class="bg-slate-950/50 border border-glassBorder rounded-2xl p-5 text-center shadow-inner relative overflow-hidden flex flex-col items-center justify-center">
+          <div class="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-indigo-500/5 to-transparent rounded-full pointer-events-none"></div>
+          
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-4 block">Dice Roller</span>
+          
+          <!-- 3D-styled animated dice representation -->
+          <div id="diceWrapper" class="relative w-24 h-24 mb-5 flex items-center justify-center select-none cursor-pointer">
+            <div id="dice3d" class="w-16 h-16 bg-gradient-to-br from-slate-200 to-white text-slate-950 rounded-2xl shadow-xl flex items-center justify-center text-4xl font-extrabold transition-all duration-300 border-b-4 border-r-4 border-slate-300 hover:scale-105 active:scale-95">
+              <i class="fa-solid fa-dice-one text-indigo-900"></i>
+            </div>
+            <!-- Glow background during rolling -->
+            <div id="diceGlow" class="absolute -inset-2 rounded-3xl bg-indigo-500/10 blur-xl opacity-0 transition-opacity duration-300 pointer-events-none"></div>
+          </div>
+
+          <!-- Turn Actions -->
+          <button id="btnRollDice" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-white font-bold shadow-lg shadow-indigo-950/20 hover:opacity-95 transition-all duration-300 transform active:scale-[0.98] disabled:opacity-40 disabled:pointer-events-none flex items-center justify-center space-x-2" disabled>
+            <i class="fa-solid fa-hand-pointer animate-bounce mr-1"></i>
+            <span>Roll Dice</span>
+          </button>
+          
+          <!-- Roll Status Box -->
+          <div id="rollStatusBox" class="mt-4 p-3 bg-slate-900/60 border border-glassBorder/50 rounded-xl w-full text-center">
+            <p id="rollStatusText" class="text-xs text-indigo-300 font-medium">Waiting for turn...</p>
+          </div>
+        </div>
+
+        <!-- Real-time Game Feed Logs -->
+        <div class="flex-grow flex flex-col min-h-[140px] max-h-[220px]">
+          <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-2 block"><i class="fa-solid fa-list-ul mr-1.5"></i>Live Battle Log</span>
+          <div id="gameFeedLogs" class="w-full flex-grow bg-slate-950/60 border border-glassBorder rounded-2xl p-4 overflow-y-auto font-mono text-xs text-slate-400 space-y-2 shadow-inner scrollbar-thin">
+            <div>&gt; Waiting for game logs...</div>
+          </div>
+        </div>
+
+        <!-- Secondary buttons -->
+        <button id="btnLeaveGame" class="w-full py-3 rounded-xl border border-rose-500/20 hover:bg-rose-500/10 text-rose-400 hover:text-rose-300 text-sm font-semibold transition-all">
+          <i class="fa-solid fa-right-from-bracket mr-2"></i>Abandon Match
+        </button>
+
+      </div>
+    </div>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="w-full text-center py-4 px-6 border-t border-glassBorder mt-auto text-xs text-slate-500 bg-[#0f172a]/60">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row justify-between items-center gap-2">
+      <span>Built as a premium real-time multiplayer Web App • MIT Licensed</span>
+      <span class="flex items-center space-x-3">
+        <span>Format: 4-Arm, 5-Hex, & 6-Star Radial Board</span>
+        <span class="w-1.5 h-1.5 rounded-full bg-slate-600"></span>
+        <span>Version 1.0</span>
+      </span>
+    </div>
+  </footer>
+
+  <!-- 4. PLACEMENT CHAMPIONS OVERLAY (GAME OVER SCREEN) -->
+  <div id="screenGameOver" class="fixed inset-0 z-50 bg-[#0b0f19]/90 backdrop-blur-md flex items-center justify-center p-4 hidden">
+    <div class="w-full max-w-lg bg-glassDark border border-glassBorder rounded-3xl p-8 text-center shadow-2xl relative overflow-hidden animate-scaleUp">
+      
+      <!-- Celebratory Sparkles -->
+      <div class="absolute inset-0 pointer-events-none">
+        <div class="absolute top-[10%] left-[20%] text-yellow-400/40 text-2xl animate-pulse"><i class="fa-solid fa-sparkles"></i></div>
+        <div class="absolute bottom-[20%] right-[10%] text-indigo-400/40 text-xl animate-pulse"><i class="fa-solid fa-star"></i></div>
+      </div>
+
+      <div class="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center text-yellow-400 text-4xl mx-auto mb-5 shadow-lg border border-yellow-500/20">
+        <i class="fa-solid fa-trophy animate-bounce"></i>
+      </div>
+
+      <h2 class="text-4xl font-extrabold font-display bg-gradient-to-r from-yellow-300 via-amber-200 to-yellow-500 bg-clip-text text-transparent mb-2">Victory Declared!</h2>
+      <p class="text-slate-400 text-sm mb-6">Here is the final placement leaderboard for this session.</p>
+
+      <!-- Leaderboard Podium -->
+      <div id="podiumList" class="space-y-3 mb-8 text-left">
+        <!-- Dynamic list of players sorted by rank -->
+      </div>
+
+      <!-- Action Panel -->
+      <div id="gameOverHostPanel" class="flex flex-col space-y-3">
+        <button id="btnReturnToLobby" class="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-500 to-violet-600 text-white font-bold shadow-xl shadow-indigo-950/30 hover:opacity-95 transition-all transform active:scale-95">
+          <i class="fa-solid fa-rotate-left mr-2"></i>Reset Room & Play Again
+        </button>
+        <p id="gameOverClientMsg" class="text-xs text-slate-500 font-medium hidden">Waiting for the host to restart the session...</p>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Socket.io client library script -->
+  <script src="/socket.io/socket.io.js"></script>
+  
+  <!-- Core Frontend Script -->
+  <script src="app.js"></script>
+</body>
+</html>
