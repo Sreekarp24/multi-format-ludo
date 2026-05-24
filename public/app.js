@@ -542,23 +542,20 @@ function PLAYER_COLORS(count) {
 
 // Setup scaling dynamically for high-DPI screens
 function setupCanvasResolution() {
-  const rect = canvas.parentNode ? canvas.parentNode.getBoundingClientRect() : { width: 0, height: 0 };
-  let width = rect.width;
-  let height = rect.height;
+  const parent = canvas.parentNode;
+  let width = parent ? parent.clientWidth : 0;
   
-  // Fallback if width/height is 0 (element hidden during initial render / reflow latency)
-  if (width === 0) {
-    const parentWidth = canvas.parentNode ? canvas.parentNode.clientWidth : 0;
-    width = parentWidth || Math.min(window.innerWidth - 48, 600);
-    height = width;
+  // Fallback if width is too small (e.g. element hidden or reflowing)
+  if (width < 100) {
+    width = Math.min(window.innerWidth - 48, 600);
   }
   
   canvas.style.width = width + 'px';
-  canvas.style.height = height + 'px';
+  canvas.style.height = width + 'px'; // Force square aspect ratio
   
   const dpr = window.devicePixelRatio || 1;
   canvas.width = width * dpr;
-  canvas.height = height * dpr;
+  canvas.height = width * dpr;
   
   ctx.scale(dpr, dpr);
   boardScale = width;
@@ -791,11 +788,11 @@ function stopGameLoop() {
 
 // Draw the entire Ludo board dynamically
 function drawLudoBoard(room, fromAnimation = false) {
-  // If canvas width or board scale is 0/falsy, force setup resolution
-  if (canvas.width === 0 || boardScale === 0) {
+  // If canvas width or board scale is too small, force setup resolution
+  if (canvas.width < 100 || boardScale < 100) {
     setupCanvasResolution();
   }
-  if (!canvas.width) return;
+  if (canvas.width < 100) return;
   
   if (!fromAnimation) {
     setupCanvasResolution();
